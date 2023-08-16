@@ -47,7 +47,7 @@ In this study, I will use Lenovo ThinkStation P500 workstation. It is a bit old,
 Install additional packages.
 
 ```
-$ sudo apt install fio jq make
+$ sudo apt install fio jq make r-base r-cran-dplyr r-cran-ggplot2 r-cran-gridextra
 ```
 
 Disable write cache on target disks (`/dev/sdb` and `/dev/sdc`).
@@ -79,7 +79,7 @@ sdc      8:32   0  10.9T  0 disk
 └─sdc1   8:33   0  1023M  0 part
 ```
 
-### IO Performance
+### Benchmark
 
 Remove old result.
 

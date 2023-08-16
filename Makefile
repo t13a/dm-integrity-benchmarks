@@ -5,8 +5,8 @@ PRINT_INFO = echo '\033[1;32m'$(1)'\033[0m' >&2
 CASES := $(patsubst cases/%.sh,%,$(wildcard cases/*.sh))
 export CASE_MNT := mnt
 
-export DISK1_DEV ?= $(error DISK1_DEV is not specified)
-export DISK2_DEV ?= $(error DISK2_DEV is not specified )
+export DISK1_DEV ?= /dev/null
+export DISK2_DEV ?= /dev/null
 
 .PHONY: test
 test: $(patsubst %,test/%,$(CASES))
@@ -86,6 +86,7 @@ report/fio:
 	mkdir -p gen
 	tools/fio2csv.sh gen/fio/*.json > gen/fio.csv
 	tools/csv2tab.sh gen/fio.csv
+	tools/fio2svg.r
 	@$(call PRINT_INFO,$@: Done)
 
 # Deprecated
