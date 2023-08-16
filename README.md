@@ -104,3 +104,11 @@ $ make report
 ```
 
 For details, see `gen/` directory.
+
+## Results
+
+### IO Performance
+
+![FIO](gen/fio.svg)
+
+(TODO)
