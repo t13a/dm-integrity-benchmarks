@@ -15,17 +15,17 @@ DISK1_CRYPT_NAME="disk1-crypt-${CASE_NUM}"
 DISK1_CRYPT_DEV="/dev/mapper/${DISK1_CRYPT_NAME}"
 
 function cmd_up() {
-    # Create and open dm-integrity.
-    sudo integritysetup format --integrity sha256 -q "${DISK1_DEV}"
-    sudo integritysetup open --integrity sha256 -q "${DISK1_DEV}" "${DISK1_INTEGRITY_NAME}"
+    # Create and open dm-integrity (no journal).
+    sudo integritysetup format --integrity sha256 --integrity-no-journal -q "${DISK1_DEV}"
+    sudo integritysetup open --integrity sha256 --integrity-no-journal -q "${DISK1_DEV}" "${DISK1_INTEGRITY_NAME}"
     sudo integritysetup status "${DISK1_INTEGRITY_NAME}"
 
-    # Create and open dm-crypt (plain mode).
+    # Create and open dm-crypt.
+    sudo cryptsetup luksFormat --key-file "${KEY_FILE}" -q "${DISK1_INTEGRITY_DEV}"
     sudo cryptsetup open \
-        --type plain \
-        --cipher aes-xts-plain64 \
         --key-file "${KEY_FILE}" \
-        --key-size 512 \
+        --perf-same_cpu_crypt \
+        --perf-submit_from_crypt_cpus \
         --perf-no_{read,write}_workqueue \
         --batch-mode \
         "${DISK1_INTEGRITY_DEV}" \
