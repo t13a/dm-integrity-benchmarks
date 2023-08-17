@@ -16,8 +16,13 @@ plotThroughput <- function(d) {
         theme(axis.text.y=element_text(hjust=0), legend.position="none")
 }
 
-p1 = plotThroughput(filter(data, grepl("^seq-", access)))
-p2 = plotThroughput(filter(data, grepl("^rand-", access)))
+saveThroughput <- function(f, h, d) {
+    p1 = plotThroughput(filter(d, grepl("^seq-", access)))
+    p2 = plotThroughput(filter(d, grepl("^rnd-", access)))
 
-a = grid.arrange(p1, p2)
-ggsave("gen/fio.svg", a, width=8, height=8, dpi=300)
+    a = grid.arrange(p1, p2)
+    ggsave(f, a, width=8, height=h, dpi=300)
+}
+
+saveThroughput("gen/fio.svg", 8, data)
+saveThroughput("gen/fio-summary.svg", 4, filter(data, grepl("^(01|03|12|13|16)-", case)))

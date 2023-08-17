@@ -12,12 +12,11 @@ reduce inputs as $s (.; .[input_filename] += $s)
     | .value.jobs[]
     | {
         "jobname": .jobname,
-        "jobname_order": (.jobname as $s | ["seq-read", "seq-write", "rand-read", "rand-write"] | index($s)),
         "case": $case,
         "bw_bytes": (.read.bw_bytes + .write.bw_bytes),
     }
 )
-| sort_by(.jobname_order, .case)
+| sort_by(.jobname, .case)
 | .[]
 | "\(.jobname),\(.case),\(.bw_bytes),\(.bw_bytes * 100 / 1024 / 1024 | floor | . / 100)"
 ' "${@}"
