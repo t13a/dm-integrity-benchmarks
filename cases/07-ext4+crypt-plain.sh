@@ -14,7 +14,15 @@ DISK1_CRYPT_DEV="/dev/mapper/${DISK1_CRYPT_NAME}"
 
 function cmd_up() {
     # Create and open dm-crypt (plain mode).
-    sudo cryptsetup open --type plain --cipher aes-xts-plain64 --key-file "${KEY_FILE}" --key-size 512 -q "${DISK1_DEV}" "${DISK1_CRYPT_NAME}"
+    sudo cryptsetup open \
+        --type plain \
+        --cipher aes-xts-plain64 \
+        --key-file "${KEY_FILE}" \
+        --key-size 512 \
+        --perf-no_{read,write}_workqueue \
+        --batch-mode \
+        "${DISK1_DEV}" \
+        "${DISK1_CRYPT_NAME}"
     sudo cryptsetup status "${DISK1_CRYPT_NAME}"
 
     # Create and mount ext4.

@@ -21,7 +21,15 @@ function cmd_up() {
     sudo integritysetup status "${DISK1_INTEGRITY_NAME}"
 
     # Create and open dm-crypt (plain mode).
-    sudo cryptsetup open --type plain --cipher aes-xts-plain64 --key-file "${KEY_FILE}" --key-size 512 -q "${DISK1_INTEGRITY_DEV}" "${DISK1_CRYPT_NAME}"
+    sudo cryptsetup open \
+        --type plain \
+        --cipher aes-xts-plain64 \
+        --key-file "${KEY_FILE}" \
+        --key-size 512 \
+        --perf-no_{read,write}_workqueue \
+        --batch-mode \
+        "${DISK1_INTEGRITY_DEV}" \
+        "${DISK1_CRYPT_NAME}"
     sudo cryptsetup status "${DISK1_CRYPT_NAME}"
 
     # Create and mount ext4.

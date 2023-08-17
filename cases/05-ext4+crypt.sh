@@ -15,7 +15,14 @@ DISK1_CRYPT_DEV="/dev/mapper/${DISK1_CRYPT_NAME}"
 function cmd_up() {
     # Create and open dm-crypt.
     sudo cryptsetup luksFormat --key-file "${KEY_FILE}" -q "${DISK1_DEV}"
-    sudo cryptsetup open --key-file "${KEY_FILE}" -q "${DISK1_DEV}" "${DISK1_CRYPT_NAME}"
+    sudo cryptsetup open \
+        --key-file "${KEY_FILE}" \
+        --perf-same_cpu_crypt \
+        --perf-submit_from_crypt_cpus \
+        --perf-no_{read,write}_workqueue \
+        --batch-mode \
+        "${DISK1_DEV}" \
+        "${DISK1_CRYPT_NAME}"
     sudo cryptsetup status "${DISK1_CRYPT_NAME}"
 
     # Create and mount ext4.
