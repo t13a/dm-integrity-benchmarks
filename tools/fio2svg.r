@@ -13,7 +13,7 @@ plotThroughput <- function(d) {
         facet_wrap(~access) +
         scale_y_discrete(limits=rev) +
         labs(x='Throughput (MiB/s)', y='') +
-        theme(legend.position="none")
+        theme(axis.text.y=element_text(hjust=0), legend.position="none")
 }
 
 p1 = plotThroughput(filter(data, grepl("^seq-", access)))
