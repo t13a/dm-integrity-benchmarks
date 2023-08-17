@@ -7,6 +7,7 @@ seq-read,06-ext4+crypt-integrity,203762016,194.32
 seq-read,07-ext4+crypt-plain,212456575,202.61
 seq-read,08-ext4+crypt-plain+integrity,194789960,185.76
 seq-read,09-ext4+raid,238016588,226.99
+seq-read,10-ext4+raid+integrity-no-journal,208478096,198.82
 seq-read,11-ext4+lvm,214481454,204.54
 seq-read,12-ext4+lvm+raid,237103379,226.11
 seq-read,13-ext4+lvm+raid+integrity-no-journal,206988919,197.4
@@ -23,6 +24,7 @@ seq-write,06-ext4+crypt-integrity,56522865,53.9
 seq-write,07-ext4+crypt-plain,217791189,207.7
 seq-write,08-ext4+crypt-plain+integrity,55881835,53.29
 seq-write,09-ext4+raid,205635475,196.1
+seq-write,10-ext4+raid+integrity-no-journal,123530395,117.8
 seq-write,11-ext4+lvm,214664999,204.72
 seq-write,12-ext4+lvm+raid,205424307,195.9
 seq-write,13-ext4+lvm+raid+integrity-no-journal,131137220,125.06
@@ -39,6 +41,7 @@ rand-read,06-ext4+crypt-integrity,1676810,1.59
 rand-read,07-ext4+crypt-plain,1698407,1.61
 rand-read,08-ext4+crypt-plain+integrity,1675266,1.59
 rand-read,09-ext4+raid,2946918,2.81
+rand-read,10-ext4+raid+integrity-no-journal,2849273,2.71
 rand-read,11-ext4+lvm,1652652,1.57
 rand-read,12-ext4+lvm+raid,2955634,2.81
 rand-read,13-ext4+lvm+raid+integrity-no-journal,2805693,2.67
@@ -55,6 +58,7 @@ rand-write,06-ext4+crypt-integrity,1223461,1.16
 rand-write,07-ext4+crypt-plain,2073128,1.97
 rand-write,08-ext4+crypt-plain+integrity,1091026,1.04
 rand-write,09-ext4+raid,1787666,1.7
+rand-write,10-ext4+raid+integrity-no-journal,1295013,1.23
 rand-write,11-ext4+lvm,2120590,2.02
 rand-write,12-ext4+lvm+raid,1794233,1.71
 rand-write,13-ext4+lvm+raid+integrity-no-journal,1219435,1.16
