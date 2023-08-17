@@ -4,7 +4,7 @@ set -euo pipefail
 
 column \
     -t \
-    -N 'Access,Case,Throughput (B/s),Throughput (MiB/s)' \
+    -N 'IO,Case,Throughput (B/s),Throughput (MB/s)' \
     -H 3 \
     -s , \
     "${@}"

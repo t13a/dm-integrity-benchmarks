@@ -18,5 +18,5 @@ reduce inputs as $s (.; .[input_filename] += $s)
 )
 | sort_by(.jobname, .case)
 | .[]
-| "\(.jobname),\(.case),\(.bw_bytes),\(.bw_bytes * 100 / 1024 / 1024 | floor | . / 100)"
+| "\(.jobname),\(.case),\(.bw_bytes),\(.bw_bytes * 100 / 1000 / 1000 | floor | . / 100)"
 ' "${@}"
