@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 
-library(dplyr)
+library(dplyr, warn.conflicts=F)
 library(ggplot2)
-library(gridExtra)
+library(gridExtra, warn.conflicts=F)
 
 plotThroughput <- function(d, title) {
     ggplot(d, aes(x=bw_mbps, xmax=max(bw_mbps) * 1.2, y=config, fill=bw_mbps, label=bw_mbps)) +
@@ -12,7 +12,7 @@ plotThroughput <- function(d, title) {
         scale_x_reverse() +
         scale_y_discrete(limits=rev, position='right') +
         labs(x='Throughput (MB/s)', y='Configuration') +
-        theme(axis.text.y=element_text(hjust=0), legend.position='none')
+        theme(axis.text.y=element_text(hjust=0), legend.position='left')
 }
 
 args = commandArgs(trailingOnly=T)

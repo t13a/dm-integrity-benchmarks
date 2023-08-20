@@ -20,7 +20,7 @@ reduce inputs as $s (.; .[input_filename] += $s)
         "bw_mbps": ((.read.bw_bytes + .write.bw_bytes) * 100 / 1000 / 1000 | floor | . / 100),
     }
 )
-| sort_by(.drive, .config, .io)
+| sort_by(.drive, .config, .rw)
 | .[]
 | "\(.drive),\(.config),\(.rw),\(.bw_mbps)"
 ' "${@}"

@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 
-library(dplyr)
+library(dplyr, warn.conflicts=F)
 library(ggplot2)
-library(gridExtra)
+library(gridExtra, warn.conflicts=F)
 
 plotThroughput <- function(d) {
     ggplot(d, aes(x=bw_mbps, y=config, label=bw_mbps, fill=drive, group=drive)) +
