@@ -96,11 +96,11 @@ $ sudo fdisk /dev/nvme0n1
 $ lsblk /dev/{sdb,sdc,nvme0n1}
 NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
 sdb           8:16   0  10.9T  0 disk
-└─sdb1        8:17   0     1G  0 part
+└─sdb1        8:17   0     8G  0 part
 sdc           8:32   0  10.9T  0 disk
-└─sdc1        8:33   0     1G  0 part
+└─sdc1        8:33   0     8G  0 part
 nvme0n1     259:0    0 931.5G  0 disk
-└─nvme0n1p1 259:2    0     1G  0 part
+└─nvme0n1p1 259:2    0     8G  0 part
 ```
 
 Create RAM drive with a larger capacity. Since btrfs has a problem of running out of free space during random writes when running on a RAM drive.
@@ -265,22 +265,6 @@ For details, see `out.sample/` directory.
 
 (TODO)
 
-- dm-integrity の使用は書き込み性能を大きく悪化させる。特にシーケンシャルリードでは 75% も下がる。ランダムリードの方は 50% の低下。ただし、ジャーナルを不使用にするかビットマップモードを使用することで 10% 程度の低下に抑えることができる。
-- dm-raid との併用はシーケンシャルライトは 40% も低下してしまう。
-- dm-crypt や LVM の併用はほとんど性能に影響しない。
-- btrfs は \#13 と同等以上の機能を持っていながら良好な性能を示している。ただし、 `17-btrfs-raid1-crypt` の `rand-write` は明らかに不正確。もしかすると btrfs が全般的に正しくないかも知れない。
-
 ## Conclusion
 
 (TODO)
-
-ベンチマークの結果、 dm-integrity の書き込み性能の悪さが浮き彫りとなった。
-
-dm-integrity が適するのは下記の用途であろう。
-
-- 書き込み頻度の少ない NAS
-- バックアップ用ストレージ
-
-btrfs を比較対象に測ってみたが、世間で言われているより良好なのは意外だった。
-
-作図のために R 言語に初めて触った。言語仕様はほとんど理解していないが、 ggplot2 が偉大であるということだけはよく分かった。

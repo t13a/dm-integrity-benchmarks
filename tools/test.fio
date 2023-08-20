@@ -8,7 +8,7 @@ ioengine=libaio
 overwrite=1
 ramp_time=5s
 runtime=20s
-size=512M
+size=1G
 startdelay=5s
 stonewall
 time_based
