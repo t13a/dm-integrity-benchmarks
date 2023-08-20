@@ -65,13 +65,13 @@ $(eval $(foreach TEST_DRIVE,$(TEST_DRIVES),$(foreach TEST_CONFIG,$(TEST_CONFIGS)
 
 
 out/all.svg: out/all.csv
-	tools/csv2svg.R $< $@ 12 '.' '.' '.'
+	tools/csv2svg.R $< $@ '.' '.' '.'
 
 out/all.csv:
 	tools/json2csv.sh out/*/*.json > $@
 
 out/drive.%.svg: out/drive.%.csv
-	tools/csv2svg.drive.R $< $@ 8 '.' '.'
+	tools/csv2svg.drive.R $< $@ '.' '.'
 
 out/drive.%.csv:
 	tools/json2csv.sh out/$*/*.json > $@
