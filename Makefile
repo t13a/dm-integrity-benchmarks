@@ -14,6 +14,12 @@ test: $(patsubst %,test/%,$(TEST_DRIVES))
 report: \
 	out/all.csv \
 	out/all.svg \
+	out/ext4+integrity.svg \
+	out/ext4+crypt.svg \
+	out/ext4+raid.hdd.svg \
+	out/ext4+lvm.hdd.svg \
+	out/btrfs.hdd.svg \
+	out/full-featured.hdd.svg \
 	$(patsubst %,report/%,$(TEST_DRIVES))
 
 define TEST_DRIVE_RULES
@@ -22,8 +28,8 @@ test/$(1): $(patsubst %,test/$(1)/%,$(TEST_CONFIGS))
 
 .PHONY: report/$(1)
 report/$(1): \
-	out/drive.$(1).csv \
-	out/drive.$(1).svg
+	out/all.$(1).csv \
+	out/all.$(1).svg
 
 endef
 $(eval $(foreach _,$(TEST_DRIVES),$(call TEST_DRIVE_RULES,$_)))
@@ -63,17 +69,34 @@ test/$(1)/$(2)/down:
 endef
 $(eval $(foreach TEST_DRIVE,$(TEST_DRIVES),$(foreach TEST_CONFIG,$(TEST_CONFIGS),$(call TEST_CONFIG_RULES,$(TEST_DRIVE),$(TEST_CONFIG)))))
 
-
 out/all.svg: out/all.csv
 	tools/csv2svg.R $< $@ '.' '.' '.'
+
+out/ext4+integrity.svg: out/all.csv
+	tools/csv2svg.R $< $@ 'hdd|ssd' '01|ext4\+integrity' '.'
+
+out/ext4+crypt.svg: out/all.csv
+	tools/csv2svg.R $< $@ 'hdd|ssd' '01|ext4\+crypt' '.'
+
+out/ext4+raid.hdd.svg: out/all.hdd.csv
+	tools/csv2svg.drive.R $< $@ '01|ext4\+raid' '.'
+
+out/ext4+lvm.hdd.svg: out/all.hdd.csv
+	tools/csv2svg.drive.R $< $@ '01|ext4\+lvm' '.'
+
+out/btrfs.hdd.svg: out/all.hdd.csv
+	tools/csv2svg.drive.R $< $@ '01|btrfs' '.'
+
+out/full-featured.hdd.svg: out/all.hdd.csv
+	tools/csv2svg.drive.R $< $@ '01|13|16' '.'
 
 out/all.csv:
 	tools/json2csv.sh out/*/*.json > $@
 
-out/drive.%.svg: out/drive.%.csv
+out/all.%.svg: out/all.%.csv
 	tools/csv2svg.drive.R $< $@ '.' '.'
 
-out/drive.%.csv:
+out/all.%.csv:
 	tools/json2csv.sh out/$*/*.json > $@
 
 .PHONY: clean
