@@ -35,7 +35,7 @@ ssd,14-btrfs,rnd-4k-q32-t16-read,1552.63
 ssd,14-btrfs,rnd-4k-q32-t16-write,20.56
 ssd,14-btrfs,seq-1m-q8-t1-read,3399.98
 ssd,14-btrfs,seq-1m-q8-t1-write,1444.82
-ssd,17-zfs,rnd-4k-q32-t16-read,84.74
-ssd,17-zfs,rnd-4k-q32-t16-write,9.73
-ssd,17-zfs,seq-1m-q8-t1-read,949.43
-ssd,17-zfs,seq-1m-q8-t1-write,575.7
+ssd,17-zfs,rnd-4k-q32-t16-read,84.19
+ssd,17-zfs,rnd-4k-q32-t16-write,14.54
+ssd,17-zfs,seq-1m-q8-t1-read,1482.35
+ssd,17-zfs,seq-1m-q8-t1-write,874.76
