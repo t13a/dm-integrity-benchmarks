@@ -5,15 +5,16 @@ library(ggplot2)
 library(gridExtra, warn.conflicts=F)
 
 plotThroughput <- function(d, title) {
-    ggplot(d, aes(x=bw_mbps, xmax=max(bw_mbps)*1.2, y=config, fill=bw_mbps, label=bw_mbps)) +
+    ggplot(d, aes(x=bw_mbps, xmax=max(bw_mbps)*1.2, y=config, fill=bw_mbps)) +
         geom_bar(stat='identity', width=0.75) +
-        geom_text(hjust=+1.2, size=2) +
+        geom_text(aes(label=bw_mbps), position=position_dodge(width=1), size=2.5, hjust=+1.1, show.legend=F) +
         facet_wrap(~rw) +
         scale_x_reverse() +
         scale_y_discrete(limits=rev, position='right') +
         labs(x='Throughput (MB/s)', y='Configuration') +
         theme(axis.text.y=element_text(hjust=0), legend.position='none')
 }
+#        geom_text(hjust=+1.2) +
 
 args = commandArgs(trailingOnly=T)
 src = args[1]

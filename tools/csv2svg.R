@@ -5,9 +5,9 @@ library(ggplot2)
 library(gridExtra, warn.conflicts=F)
 
 plotThroughput <- function(d) {
-    ggplot(d, aes(x=bw_mbps, xmax=max(bw_mbps)*1.2, y=config, fill=drive)) +
-        geom_bar(position="dodge", stat='identity', width=0.75) +
-        geom_text(aes(label=bw_mbps, color=drive), position=position_dodge(width=1), hjust=+1.2, size=2, show.legend=F) +
+    ggplot(d, aes(x=bw_mbps, xmax=max(bw_mbps)*1.3, y=config, fill=drive)) +
+        geom_bar(position="dodge", stat='identity', width=0.9) +
+        geom_text(aes(label=bw_mbps, color=drive), position=position_dodge(width=1), size=3, hjust=+1.1, show.legend=F) +
         facet_wrap(~rw) +
         scale_x_reverse() +
         scale_y_discrete(limits=rev, position="right") +
