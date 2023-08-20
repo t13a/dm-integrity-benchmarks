@@ -36,7 +36,7 @@ function cmd_up() {
     # Create and mount ext4.
     sudo mkfs.ext4 -F "${DISK1_CRYPT_DEV}"
     mkdir -p "${TEST_MNT}"
-    sudo mount "${DISK1_CRYPT_DEV}" "${TEST_MNT}"
+    sudo mount -t ext4 "${DISK1_CRYPT_DEV}" "${TEST_MNT}"
     sudo chmod a+rwx "${TEST_MNT}"
 
     # Print status.

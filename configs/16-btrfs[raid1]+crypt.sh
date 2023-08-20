@@ -53,7 +53,7 @@ function cmd_up() {
         "${DISK2_CRYPT_DEV}"
     while ! [ -e "${BTRFS_DEV}" ]; do sleep 1; done # TODO: Wait properly.
     mkdir -p "${TEST_MNT}"
-    sudo mount "${BTRFS_DEV}" "${TEST_MNT}"
+    sudo mount -t btrfs "${BTRFS_DEV}" "${TEST_MNT}"
     sudo chmod a+rwx "${TEST_MNT}"
     sudo btrfs scrub start -B -f "${BTRFS_DEV}"
 
