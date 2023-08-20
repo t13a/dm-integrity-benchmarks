@@ -1,8 +1,8 @@
 [global]
 direct=1
-directory=mnt
+directory=${CASE_MNT}
 end_fsync=1
-filename=payload.bin
+filename=test.dat
 group_reporting
 ioengine=libaio
 overwrite=1
