@@ -186,47 +186,47 @@ $ make report
 ...
 ```
 
-For details, see `out/` directory.
+For details, see `out.sample/` directory.
 
 ## Results & Discussion
 
 Here are all the test results.
 
-![FIO](out/all.svg)
+![FIO](out.sample/all.svg)
 
 ### ext4 vs dm-integrity
 
-![FIO](out/ext4+integrity.svg)
+![FIO](out.sample/ext4+integrity.svg)
 
 (TODO)
 
 ### ext4 vs dm-crypt
 
-![FIO](out/ext4+crypt.svg)
+![FIO](out.sample/ext4+crypt.svg)
 
 (TODO)
 
 ### ext4 vs dm-raid
 
-![FIO](out/ext4+raid.hdd.svg)
+![FIO](out.sample/ext4+raid.hdd.svg)
 
 (TODO)
 
 ### ext4 vs LVM
 
-![FIO](out/ext4+lvm.hdd.svg)
+![FIO](out.sample/ext4+lvm.hdd.svg)
 
 (TODO)
 
 ### ext4 vs btrfs
 
-![FIO](out/btrfs.hdd.svg)
+![FIO](out.sample/btrfs.hdd.svg)
 
 (TODO)
 
 ### ext4 vs the full-featured configurations
 
-![FIO](out/full-featured.hdd.svg)
+![FIO](out.sample/full-featured.hdd.svg)
 
 (TODO)
 
