@@ -2,28 +2,28 @@
 
 set -euxo pipefail
 
-CASE_NAME="$(basename "${BASH_SOURCE[0]%.sh}")"
-CASE_NUM="${CASE_NAME%%-*}"
-CASE_MNT="${CASE_MNT}"
+CONFIG_NAME="$(basename "${BASH_SOURCE[0]%.sh}")"
+CONFIG_NUM="${CONFIG_NAME%%-*}"
+TEST_MNT="${TEST_MNT}"
 
 KEY_FILE="$(dirname "${BASH_SOURCE[0]}")/key.bin"
 
 DISK1_DEV="${DISK1_DEV}"
-DISK1_CRYPT_NAME="disk1-crypt-${CASE_NUM}"
+DISK1_CRYPT_NAME="disk1-crypt-${CONFIG_NUM}"
 DISK1_CRYPT_DEV="/dev/mapper/${DISK1_CRYPT_NAME}"
-DISK1_INTEGRITY_NAME="disk1-integrity-${CASE_NUM}"
+DISK1_INTEGRITY_NAME="disk1-integrity-${CONFIG_NUM}"
 DISK1_INTEGRITY_DEV="/dev/mapper/${DISK1_INTEGRITY_NAME}"
 
 DISK2_DEV="${DISK2_DEV}"
-DISK2_CRYPT_NAME="disk2-crypt-${CASE_NUM}"
+DISK2_CRYPT_NAME="disk2-crypt-${CONFIG_NUM}"
 DISK2_CRYPT_DEV="/dev/mapper/${DISK2_CRYPT_NAME}"
-DISK2_INTEGRITY_NAME="disk2-integrity-${CASE_NUM}"
+DISK2_INTEGRITY_NAME="disk2-integrity-${CONFIG_NUM}"
 DISK2_INTEGRITY_DEV="/dev/mapper/${DISK2_INTEGRITY_NAME}"
 
-MD_NAME="md-${CASE_NUM}"
+MD_NAME="md-${CONFIG_NUM}"
 MD_DEV="/dev/md/${MD_NAME}"
 
-VG_NAME="vg-${CASE_NUM}"
+VG_NAME="vg-${CONFIG_NUM}"
 
 LV_NAME="lv"
 LV_DEV="/dev/${VG_NAME}/${LV_NAME}"
@@ -86,9 +86,9 @@ function cmd_up() {
 
     # Create and mount ext4.
     sudo mkfs.ext4 -F "${LV_DEV}"
-    mkdir -p "${CASE_MNT}"
-    sudo mount "${LV_DEV}" "${CASE_MNT}"
-    sudo chmod a+rwx "${CASE_MNT}"
+    mkdir -p "${TEST_MNT}"
+    sudo mount "${LV_DEV}" "${TEST_MNT}"
+    sudo chmod a+rwx "${TEST_MNT}"
 
     # Print status.
     lsblk "${DISK1_DEV}" "${DISK2_DEV}"
@@ -96,17 +96,17 @@ function cmd_up() {
 
 function cmd_exec() {
     env \
-        CASE_NAME="${CASE_NAME}" \
-        CASE_NUM="${CASE_NUM}" \
-        CASE_DEV="${LV_DEV}" \
-        CASE_MNT="${CASE_MNT}" \
+        CONFIG_NAME="${CONFIG_NAME}" \
+        CONFIG_NUM="${CONFIG_NUM}" \
+        TEST_DEV="${LV_DEV}" \
+        TEST_MNT="${TEST_MNT}" \
         "${@}"
 }
 
 function cmd_down() {
     # Unmount ext4.
-    ! mountpoint "${CASE_MNT}" || sudo umount "${CASE_MNT}"
-    ! [ -e "${CASE_MNT}" ] || sudo rmdir --ignore-fail-on-non-empty -p "${CASE_MNT}"
+    ! mountpoint "${TEST_MNT}" || sudo umount "${TEST_MNT}"
+    ! [ -e "${TEST_MNT}" ] || sudo rmdir --ignore-fail-on-non-empty -p "${TEST_MNT}"
 
     # Remove LV.
     ! sudo lvs "${LV_DEV}" || sudo lvremove -f "${LV_DEV}"

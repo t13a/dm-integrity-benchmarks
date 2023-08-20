@@ -1,6 +1,6 @@
 [global]
 direct=1
-directory=${CASE_MNT}
+directory=${TEST_MNT}
 end_fsync=1
 filename=test.dat
 group_reporting
