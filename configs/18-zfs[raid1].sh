@@ -17,7 +17,8 @@ function cmd_up() {
     sudo zpool create -f "${ZFS_POOL}" mirror "${DISK1_DEV}" "${DISK2_DEV}"
     sudo zfs create \
         -o mountpoint="$(realpath "${TEST_MNT}")" \
-        -o primarycache=none \
+        -o primarycache=metadata \
+        -o secondarycache=metadata \
         "${ZFS_POOL}/${ZFS_FS}"
     sudo zfs list "${ZFS_POOL}" "${ZFS_POOL}/${ZFS_FS}"
     sudo chmod a+rwx "${TEST_MNT}"

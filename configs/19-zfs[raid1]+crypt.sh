@@ -47,7 +47,8 @@ function cmd_up() {
     sudo zpool create -f "${ZFS_POOL}" mirror "${DISK1_CRYPT_DEV}" "${DISK2_CRYPT_DEV}"
     sudo zfs create \
         -o mountpoint="$(realpath "${TEST_MNT}")" \
-        -o primarycache=none \
+        -o primarycache=metadata \
+        -o secondarycache=metadata \
         "${ZFS_POOL}/${ZFS_FS}"
     sudo zfs list "${ZFS_POOL}" "${ZFS_POOL}/${ZFS_FS}"
     sudo chmod a+rwx "${TEST_MNT}"
@@ -70,6 +71,10 @@ function cmd_down() {
     ! sudo zfs list "${ZFS_POOL}/${ZFS_FS}" || sudo zfs destroy "${ZFS_POOL}/${ZFS_FS}"
     ! sudo zpool list "${ZFS_POOL}" || sudo zpool destroy "${ZFS_POOL}"
     ! [ -e "${TEST_MNT}" ] || sudo rmdir --ignore-fail-on-non-empty -p "${TEST_MNT}"
+
+    # Close dm-crypt.
+    ! [ -e "${DISK1_CRYPT_DEV}" ] || sudo cryptsetup close "${DISK1_CRYPT_NAME}"
+    ! [ -e "${DISK2_CRYPT_DEV}" ] || sudo cryptsetup close "${DISK2_CRYPT_NAME}"
 }
 
 "cmd_${1}" "${@:2}"
