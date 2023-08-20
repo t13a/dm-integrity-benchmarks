@@ -24,10 +24,10 @@ LV_DEV="/dev/${VG_NAME}/${LV_NAME}"
 
 function cmd_up() {
     # Create and open dm-integrity (no journal).
-    sudo integritysetup format --integrity sha256 --integrity-no-journal -q "${DISK1_DEV}"
-    sudo integritysetup format --integrity sha256 --integrity-no-journal -q "${DISK2_DEV}"
-    sudo integritysetup open --integrity sha256 --integrity-no-journal -q "${DISK1_DEV}" "${DISK1_INTEGRITY_NAME}"
-    sudo integritysetup open --integrity sha256 --integrity-no-journal -q "${DISK2_DEV}" "${DISK2_INTEGRITY_NAME}"
+    sudo integritysetup format --integrity-no-journal -q "${DISK1_DEV}"
+    sudo integritysetup format --integrity-no-journal -q "${DISK2_DEV}"
+    sudo integritysetup open --integrity-no-journal -q "${DISK1_DEV}" "${DISK1_INTEGRITY_NAME}"
+    sudo integritysetup open --integrity-no-journal -q "${DISK2_DEV}" "${DISK2_INTEGRITY_NAME}"
     sudo integritysetup status "${DISK1_INTEGRITY_NAME}"
     sudo integritysetup status "${DISK2_INTEGRITY_NAME}"
 
