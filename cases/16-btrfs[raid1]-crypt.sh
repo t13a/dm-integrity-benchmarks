@@ -17,7 +17,7 @@ DISK2_CRYPT_NAME="disk2-crypt-${CASE_NUM}"
 DISK2_CRYPT_DEV="/dev/mapper/${DISK2_CRYPT_NAME}"
 
 BTRFS_LABEL="btrfs-${CASE_NUM}"
-BTRFS_DEV="/dev/disk/by-label/${BTRFS_LABEL}"
+BTRFS_DEV="${DISK1_CRYPT_DEV}"
 
 function cmd_up() {
     # Create and open dm-crypt.

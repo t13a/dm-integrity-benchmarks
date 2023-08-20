@@ -10,7 +10,7 @@ DISK1_DEV="${DISK1_DEV}"
 DISK2_DEV="${DISK2_DEV}"
 
 BTRFS_LABEL="btrfs-${CASE_NUM}"
-BTRFS_DEV="/dev/disk/by-label/${BTRFS_LABEL}"
+BTRFS_DEV="${DISK1_DEV}"
 
 function cmd_up() {
     # Create and mount btrfs.
