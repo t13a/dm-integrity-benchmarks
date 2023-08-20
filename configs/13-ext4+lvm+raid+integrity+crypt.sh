@@ -2,19 +2,20 @@
 
 set -euxo pipefail
 
+if [ -z "${DISK1_DEV:-}" ]; then echo "DISK1_DEV: not specified. skipping..." >&2; exit 0; fi
+if [ -z "${DISK2_DEV:-}" ]; then echo "DISK2_DEV: not specified. skipping..." >&2; exit 0; fi
+if [ -z "${TEST_MNT:-}" ]; then echo "TEST_MNT: not specified. skipping..." >&2; exit 0; fi
+
 CONFIG_NAME="$(basename "${BASH_SOURCE[0]%.sh}")"
 CONFIG_NUM="${CONFIG_NAME%%-*}"
-TEST_MNT="${TEST_MNT}"
 
 KEY_FILE="$(dirname "${BASH_SOURCE[0]}")/key.bin"
 
-DISK1_DEV="${DISK1_DEV}"
 DISK1_CRYPT_NAME="disk1-crypt-${CONFIG_NUM}"
 DISK1_CRYPT_DEV="/dev/mapper/${DISK1_CRYPT_NAME}"
 DISK1_INTEGRITY_NAME="disk1-integrity-${CONFIG_NUM}"
 DISK1_INTEGRITY_DEV="/dev/mapper/${DISK1_INTEGRITY_NAME}"
 
-DISK2_DEV="${DISK2_DEV}"
 DISK2_CRYPT_NAME="disk2-crypt-${CONFIG_NUM}"
 DISK2_CRYPT_DEV="/dev/mapper/${DISK2_CRYPT_NAME}"
 DISK2_INTEGRITY_NAME="disk2-integrity-${CONFIG_NUM}"

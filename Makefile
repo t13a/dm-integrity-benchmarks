@@ -7,13 +7,6 @@ TEST_DRIVES = hdd ssd ram
 TEST_CONFIGS := $(patsubst configs/%.sh,%,$(wildcard configs/*.sh))
 export TEST_MNT := mnt
 
-HDD1_DEV ?= /dev/null
-HDD2_DEV ?= /dev/null
-SSD1_DEV ?= /dev/null
-SSD2_DEV ?= /dev/null
-RAM1_DEV ?= /dev/null
-RAM2_DEV ?= /dev/null
-
 .PHONY: test
 test: $(patsubst %,test/%,$(TEST_DRIVES))
 
