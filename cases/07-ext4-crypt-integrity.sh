@@ -16,8 +16,8 @@ DISK1_CRYPT_DEV="/dev/mapper/${DISK1_CRYPT_NAME}"
 
 function cmd_up() {
     # Create and open dm-integrity (no journal).
-    sudo integritysetup format --integrity-no-journal -q "${DISK1_DEV}"
-    sudo integritysetup open --integrity-no-journal -q "${DISK1_DEV}" "${DISK1_INTEGRITY_NAME}"
+    sudo integritysetup format -q "${DISK1_DEV}"
+    sudo integritysetup open -q "${DISK1_DEV}" "${DISK1_INTEGRITY_NAME}"
     sudo integritysetup status "${DISK1_INTEGRITY_NAME}"
 
     # Create and open dm-crypt.
