@@ -35,3 +35,7 @@ ram,14-btrfs,rnd-4k-q32-t16-read,2068.73
 ram,14-btrfs,rnd-4k-q32-t16-write,41.74
 ram,14-btrfs,seq-1m-q8-t1-read,5644.51
 ram,14-btrfs,seq-1m-q8-t1-write,3651.48
+ram,17-zfs,rnd-4k-q32-t16-read,223.93
+ram,17-zfs,rnd-4k-q32-t16-write,68.34
+ram,17-zfs,seq-1m-q8-t1-read,1906.74
+ram,17-zfs,seq-1m-q8-t1-write,1927.72

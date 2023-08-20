@@ -19,6 +19,7 @@ report: \
 	out/ext4+raid.hdd.svg \
 	out/ext4+lvm.hdd.svg \
 	out/btrfs.hdd.svg \
+	out/zfs.hdd.svg \
 	out/full-featured.hdd.svg \
 	$(patsubst %,report/%,$(TEST_DRIVES))
 
@@ -87,8 +88,11 @@ out/ext4+lvm.hdd.svg: out/all.hdd.csv
 out/btrfs.hdd.svg: out/all.hdd.csv
 	tools/csv2svg.drive.R $< $@ '01|btrfs' '.'
 
+out/zfs.hdd.svg: out/all.hdd.csv
+	tools/csv2svg.drive.R $< $@ '01|zfs' '.'
+
 out/full-featured.hdd.svg: out/all.hdd.csv
-	tools/csv2svg.drive.R $< $@ '01|13|16' '.'
+	tools/csv2svg.drive.R $< $@ '01|13|16|19' '.'
 
 out/all.csv:
 	tools/json2csv.sh out/*/*.json > $@

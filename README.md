@@ -38,14 +38,24 @@ In this study, I use Lenovo ThinkStation P500 workstation. It was a bit old, but
 | **NVMe SSD #1** | **1 TB NVMe SSD (WD Red SN700)**                | ✅ (`/dev/nvme0n1`) |
 | OS              | Linux 6.1.0 (Debian 12.1 Bookworm)              | -                   |
 
+Install additional packages.
+
+```sh
+$ sudo apt install zfs-dkms zfsutils-linux
+...
+```
+
 The versions of the package are as follows.
 
 ```sh
-$ apt list --installed 2>/dev/null | grep -E '^(btrfs-progs|cryptsetup-bin|lvm2|mdadm)/'
+$ apt list --installed 2>/dev/null | grep -E '^(btrfs-progs|cryptsetup-bin|lvm2|mdadm|zfs*)/'
 btrfs-progs/stable,now 6.2-1 amd64 [installed,automatic]
 cryptsetup-bin/stable,now 2:2.6.1-4~deb12u1 amd64 [installed,automatic]
 lvm2/stable,now 2.03.16-2 amd64 [installed,automatic]
 mdadm/stable,now 4.2-5 amd64 [installed,automatic]
+zfs-dkms/stable,now 2.1.11-1 all [installed]
+zfs-zed/stable,now 2.1.11-1 amd64 [installed,automatic]
+zfsutils-linux/stable,now 2.1.11-1 amd64 [installed]
 ```
 
 Disable write cache for SATA HDD \#1~2.
@@ -104,7 +114,7 @@ ram0   1:0    0   8G  0 disk
 
 ### Test configurations
 
-The following are candidate configurations suitable for long-term storage based on the features merged into the Linux kernel.
+The following are candidate configurations suitable for long-term storage ~~based on the features merged into the Linux kernel~~ combined filesystems widely used in Linux.
 
 | #   | Configuration                                               | Encryption | Redundancy | Scrubbing | Snapshot |
 | --- | ----------------------------------------------------------- | ---------- | ---------- | --------- | -------- |
@@ -124,6 +134,9 @@ The following are candidate configurations suitable for long-term storage based 
 | 14  | btrfs                                                       | ❌         | ❌         | ✅        | ✅       |
 | 15  | btrfs (RAID 1)                                              | ❌         | ✅         | ✅        | ✅       |
 | 16  | btrfs (RAID 1) on dm-crypt                                  | ✅         | ✅         | ✅        | ✅       |
+| 17  | ZFS                                                         | ❌         | ❌         | ✅        | ✅       |
+| 18  | ZFS (RAID 1)                                                | ❌         | ✅         | ✅        | ✅       |
+| 19  | ZFS (RAID 1) on dm-crypt                                    | ✅         | ✅         | ✅        | ✅       |
 
 ⚠️...dm-raid cannot correct bad data (can only bad sectors).
 
@@ -138,6 +151,8 @@ The following are candidate configurations suitable for long-term storage based 
 **ext4 on LVM** (\#10~13) is (TODO). There is also a command `lvmraid` to build RAID on LV, but it is out of the scope of this study.
 
 **btrfs** (\#14~16) has all features except encryption. (TODO).
+
+**ZFS** (\#17~19) is (TODO).
 
 ### Data collection
 
@@ -188,11 +203,25 @@ $ make report
 
 For details, see `out.sample/` directory.
 
-## Results & Discussion
+## Results & discussion
 
-Here are all the test results.
+### SATA HDD #1~2
 
-![FIO](out.sample/all.svg)
+![FIO](out.sample/all.hdd.svg)
+
+(TODO)
+
+### NVMe SSD #1
+
+![FIO](out.sample/all.ssd.svg)
+
+(TODO)
+
+### RAM
+
+![FIO](out.sample/all.ram.svg)
+
+(TODO)
 
 ### ext4 vs dm-integrity
 
@@ -224,21 +253,34 @@ Here are all the test results.
 
 (TODO)
 
+### ext4 vs ZFS
+
+![FIO](out.sample/zfs.hdd.svg)
+
+(TODO)
+
 ### ext4 vs the full-featured configurations
 
 ![FIO](out.sample/full-featured.hdd.svg)
 
 (TODO)
 
+- dm-integrity の使用は書き込み性能を大きく悪化させる。特にシーケンシャルリードでは 75% も下がる。ランダムリードの方は 50% の低下。ただし、ジャーナルを不使用にするかビットマップモードを使用することで 10% 程度の低下に抑えることができる。
+- dm-raid との併用はシーケンシャルライトは 40% も低下してしまう。
+- dm-crypt や LVM の併用はほとんど性能に影響しない。
+- btrfs は \#13 と同等以上の機能を持っていながら良好な性能を示している。ただし、 `17-btrfs-raid1-crypt` の `rand-write` は明らかに不正確。もしかすると btrfs が全般的に正しくないかも知れない。
 
 ## Conclusion
 
 (TODO)
 
-## References
+ベンチマークの結果、 dm-integrity の書き込み性能の悪さが浮き彫りとなった。
 
-- [dm-integrity — The Linux Kernel documentation](https://docs.kernel.org/admin-guide/device-mapper/dm-integrity.html)
-- [GitHub - axboe/fio: Flexible I/O Tester](https://github.com/axboe/fio)
-- [Performance benchmarking with Fio on Nutanix](https://portal.nutanix.com/page/documents/kbs/details?targetId=kA07V000000LX7xSAG)
-- [Speeding up Linux disk encryption](https://blog.cloudflare.com/speeding-up-linux-disk-encryption/)
-- [CrystalDiskMark - Crystal Dew World [en]](https://crystalmark.info/en/category/crystaldiskmark/)
+dm-integrity が適するのは下記の用途であろう。
+
+- 書き込み頻度の少ない NAS
+- バックアップ用ストレージ
+
+btrfs を比較対象に測ってみたが、世間で言われているより良好なのは意外だった。
+
+作図のために R 言語に初めて触った。言語仕様はほとんど理解していないが、 ggplot2 が偉大であるということだけはよく分かった。
