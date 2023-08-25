@@ -24,6 +24,7 @@ function cmd_up() {
         --batch-mode \
         "${DISK1_DEV}" \
         "${DISK1_CRYPT_NAME}"
+    sudo integritysetup status "${DISK1_CRYPT_NAME}_dif"
     sudo cryptsetup status "${DISK1_CRYPT_NAME}"
 
     # Create and mount ext4.
