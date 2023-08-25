@@ -53,8 +53,8 @@ function cmd_up() {
     sudo cryptsetup status "${DISK2_CRYPT_NAME}"
 
     # Create and open dm-integrity (no journal).
-    sudo integritysetup format -q "${DISK1_CRYPT_DEV}"
-    sudo integritysetup format -q "${DISK2_CRYPT_DEV}"
+    sudo integritysetup format --sector-size=4096 -q "${DISK1_CRYPT_DEV}"
+    sudo integritysetup format --sector-size=4096 -q "${DISK2_CRYPT_DEV}"
     sudo integritysetup open -q "${DISK1_CRYPT_DEV}" "${DISK1_INTEGRITY_NAME}"
     sudo integritysetup open -q "${DISK2_CRYPT_DEV}" "${DISK2_INTEGRITY_NAME}"
     sudo integritysetup status "${DISK1_INTEGRITY_NAME}"

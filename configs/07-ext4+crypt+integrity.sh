@@ -17,7 +17,7 @@ DISK1_CRYPT_DEV="/dev/mapper/${DISK1_CRYPT_NAME}"
 
 function cmd_up() {
     # Create and open dm-integrity (no journal).
-    sudo integritysetup format -q "${DISK1_DEV}"
+    sudo integritysetup format --sector-size=4096 -q "${DISK1_DEV}"
     sudo integritysetup open -q "${DISK1_DEV}" "${DISK1_INTEGRITY_NAME}"
     sudo integritysetup status "${DISK1_INTEGRITY_NAME}"
 

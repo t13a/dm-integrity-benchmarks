@@ -20,8 +20,8 @@ MD_DEV="/dev/md/${MD_NAME}"
 
 function cmd_up() {
     # Create and open dm-integrity (no journal).
-    sudo integritysetup format -q "${DISK1_DEV}"
-    sudo integritysetup format -q "${DISK2_DEV}"
+    sudo integritysetup format --sector-size=4096 -q "${DISK1_DEV}"
+    sudo integritysetup format --sector-size=4096 -q "${DISK2_DEV}"
     sudo integritysetup open -q "${DISK1_DEV}" "${DISK1_INTEGRITY_NAME}"
     sudo integritysetup open -q "${DISK2_DEV}" "${DISK2_INTEGRITY_NAME}"
     sudo integritysetup status "${DISK1_INTEGRITY_NAME}"
