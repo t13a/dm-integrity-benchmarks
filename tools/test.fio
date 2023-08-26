@@ -15,28 +15,24 @@ time_based
 
 [seq-1m-q8-t1-read]
 bs=1M
-fsync_on_close=1
 iodepth=8
 numjobs=1
 rw=read
 
 [seq-1m-q8-t1-write]
 bs=1M
-fsync_on_close=1
 iodepth=8
 numjobs=1
 rw=write
 
 [rnd-4k-q32-t16-read]
 bs=4K
-fsync=1
 iodepth=32
 numjobs=16
 rw=randread
 
 [rnd-4k-q32-t16-write]
 bs=4K
-fsync=1
 iodepth=32
 numjobs=16
 rw=randwrite
