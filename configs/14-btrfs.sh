@@ -12,7 +12,7 @@ function cmd_up() {
     # Create and mount btrfs.
     sudo mkfs.btrfs -f "${DISK1_DEV}"
     mkdir -p "${TEST_MNT}"
-    sudo mount -t btrfs "${DISK1_DEV}" "${TEST_MNT}"
+    sudo mount -t btrfs -o commit=5 "${DISK1_DEV}" "${TEST_MNT}"
     sudo chmod a+rwx "${TEST_MNT}"
 
     # Print status.
