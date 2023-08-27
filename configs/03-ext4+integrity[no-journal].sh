@@ -13,8 +13,15 @@ DISK1_INTEGRITY_DEV="/dev/mapper/${DISK1_INTEGRITY_NAME}"
 
 function cmd_up() {
     # Create and open dm-integrity (no journal).
-    sudo integritysetup format --sector-size=4096 --integrity-no-journal -q "${DISK1_DEV}"
-    sudo integritysetup open --integrity-no-journal -q "${DISK1_DEV}" "${DISK1_INTEGRITY_NAME}"
+    sudo integritysetup format \
+        --sector-size=4096 \
+        --batch-mode \
+        "${DISK1_DEV}"
+    sudo integritysetup open \
+        --integrity-no-journal \
+        --batch-mode \
+        "${DISK1_DEV}" \
+        "${DISK1_INTEGRITY_NAME}"
     sudo integritysetup status "${DISK1_INTEGRITY_NAME}"
 
     # Create and mount ext4.
