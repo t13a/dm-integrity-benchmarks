@@ -14,8 +14,12 @@ DISK1_CRYPT_NAME="disk1-crypt-${CONFIG_NUM}"
 DISK1_CRYPT_DEV="/dev/mapper/${DISK1_CRYPT_NAME}"
 
 function cmd_up() {
-    # Create and open dm-crypt (with --integrity option).
-    sudo cryptsetup luksFormat --key-file "${KEY_FILE}" --integrity hmac-sha256 -q "${DISK1_DEV}"
+    # Create and open dm-crypt (with dm-integrity, HMAC-SHA256).
+    sudo cryptsetup luksFormat \
+        --key-file "${KEY_FILE}" \
+        --integrity hmac-sha256 \
+        --batch-mode \
+        "${DISK1_DEV}"
     sudo cryptsetup open \
         --key-file "${KEY_FILE}" \
         --perf-same_cpu_crypt \

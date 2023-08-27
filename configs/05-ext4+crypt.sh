@@ -15,7 +15,10 @@ DISK1_CRYPT_DEV="/dev/mapper/${DISK1_CRYPT_NAME}"
 
 function cmd_up() {
     # Create and open dm-crypt.
-    sudo cryptsetup luksFormat --key-file "${KEY_FILE}" -q "${DISK1_DEV}"
+    sudo cryptsetup luksFormat \
+        --key-file "${KEY_FILE}" \
+        --batch-mode \
+        "${DISK1_DEV}"
     sudo cryptsetup open \
         --key-file "${KEY_FILE}" \
         --perf-same_cpu_crypt \

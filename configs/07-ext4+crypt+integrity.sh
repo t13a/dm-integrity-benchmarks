@@ -29,7 +29,10 @@ function cmd_up() {
     sudo integritysetup status "${DISK1_INTEGRITY_NAME}"
 
     # Create and open dm-crypt.
-    sudo cryptsetup luksFormat --key-file "${KEY_FILE}" -q "${DISK1_INTEGRITY_DEV}"
+    sudo cryptsetup luksFormat \
+        --key-file "${KEY_FILE}" \
+        --batch-mode \
+        "${DISK1_INTEGRITY_DEV}"
     sudo cryptsetup open \
         --key-file "${KEY_FILE}" \
         --perf-same_cpu_crypt \

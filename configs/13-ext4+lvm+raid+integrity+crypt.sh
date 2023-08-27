@@ -31,8 +31,14 @@ LV_DEV="/dev/${VG_NAME}/${LV_NAME}"
 
 function cmd_up() {
     # Create and open dm-crypt.
-    sudo cryptsetup luksFormat --key-file "${KEY_FILE}" -q "${DISK1_DEV}"
-    sudo cryptsetup luksFormat --key-file "${KEY_FILE}" -q "${DISK2_DEV}"
+    sudo cryptsetup luksFormat \
+        --key-file "${KEY_FILE}" \
+        --batch-mode \
+        "${DISK1_DEV}"
+    sudo cryptsetup luksFormat \
+        --key-file "${KEY_FILE}" \
+        --batch-mode \
+        "${DISK2_DEV}"
     sudo cryptsetup open \
         --key-file "${KEY_FILE}" \
         --perf-same_cpu_crypt \
