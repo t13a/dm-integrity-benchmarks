@@ -47,7 +47,7 @@ In this study, I use Lenovo ThinkStation P500 workstation. It was a bit old, but
 Install additional packages.
 
 ```sh
-$ sudo apt install zfs-dkms zfsutils-linux
+$ sudo apt install nvme-cli zfs-dkms zfsutils-linux
 ...
 ```
 
@@ -76,6 +76,19 @@ $ sudo hdparm -W0 /dev/{sdb,sdc}
 /dev/sdc:
  setting drive write-caching to 0 (off)
  write-caching =  0 (off)
+```
+
+Change the sector size of the NVMe SSD \#1 to 4096 bytes.
+
+```sh
+$ sudo nvme id-ns -H /dev/nvme0n1 | grep LBA
+  [6:5] : 0	Most significant 2 bits of Current LBA Format Selected
+  [3:0] : 0	Least significant 4 bits of Current LBA Format Selected
+  [0:0] : 0	Metadata as Part of Extended Data LBA Not Supported
+LBA Format  0 : Metadata Size: 0   bytes - Data Size: 512 bytes - Relative Performance: 0x2 Good (in use)
+LBA Format  1 : Metadata Size: 0   bytes - Data Size: 4096 bytes - Relative Performance: 0x1 Better
+$ sudo nvme format --lbaf=1 /dev/nvme0n1
+...
 ```
 
 Set IO scheduler to `none` for SATA HDD \#1~2.
