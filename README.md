@@ -10,19 +10,40 @@ No one wants to lose their data. However, gigantic cloud providers ruthlessly cl
 
 ### Silent data corruption
 
-Linux offers a variety of options to meet our needs. We can build a RAID for redundancy and make consistent backups from LVM snapshots. Our and our families' data is safe. Is it true? dm-raid, the software RAID implemented in Linux kernel, can detect bad sectors and repair them, but cannot correct bad data in good sectors occured by some reason. If left as is, the correct backup could be overwritten with bad data. Just thinking of it is scary.
+Linux offers a variety of options to meet our needs. We can build a RAID for redundancy and make consistent backups from [LVM](https://sourceware.org/lvm2/) snapshots. Our and our families' data is safe. Is it true? [dm-raid](https://docs.kernel.org/admin-guide/device-mapper/dm-raid.html), the software RAID implemented in Linux kernel, can detect bad sectors and repair them, but cannot correct bad data in good sectors occured by some reason. If left as is, the correct backup could be overwritten with bad data. Just thinking of it is scary.
 
-This phenomenon is called [silent data corruption](https://en.wikipedia.org/wiki/Data_corruption#Silent) (as known as **bit rot**). It is caused by incomplete insulation, high temperature environment, cosmic radiation impact, etc. Although the probability is low, it is a non-negligible cause of failure for me who wants to maintain data reliably over the long term.
+This phenomenon is called [silent data corruption](https://en.wikipedia.org/wiki/Data_corruption#Silent) (as known as **bit rot**). It is caused by incomplete insulation, high temperature environment, cosmic radiation impact, etc. Although the probability is low, it is a non-negligible cause of failure for us who wants to maintain data reliably over the long term.
 
 ### Solution candidates
 
-[dm-integrity](https://docs.kernel.org/admin-guide/device-mapper/dm-integrity.html) is a Linux device mapper that provides per-block integrity checking. When dm-integrity detects bad data, it is detected by dm-raid as a bad sector. This allows dm-raid to detect bad data and repair it by rebuilding the disk array. In addition, dm-integrity provides tamper detection when combined with [dm-crypt](https://docs.kernel.org/admin-guide/device-mapper/dm-crypt.html). However, this feature is still experimental. In any case, you can choose any top-level file system you like. Many people may choose [ext4](https://www.kernel.org/doc/html/latest/filesystems/ext4/), but it can be anything else.
+[dm-integrity](https://docs.kernel.org/admin-guide/device-mapper/dm-integrity.html) is a Linux device mapper that provides per-block integrity checking. When dm-integrity detects bad data, it is detected by dm-raid as a bad sector. This allows dm-raid to repair bad data by rebuilding the disk array. In addition, dm-integrity provides tamper detection when combined with [dm-crypt](https://docs.kernel.org/admin-guide/device-mapper/dm-crypt.html). However, this feature is still experimental. In any case, you can choose any top-level file system you like. Many people may choose [ext4](https://www.kernel.org/doc/html/latest/filesystems/ext4/), but it can be anything else.
 
-Some filesystems have data correction capability (called **scrubbing**) by themselves. On Linux, [btrfs](https://docs.kernel.org/filesystems/btrfs.html) and [OpenZFS](https://github.com/openzfs/zfs) (the Linux port of ZFS) are the most common. They have RAID and snapshot capabilities and are expected to be simpler to configure and faster than a combination of device mappers. However, btrfs has long been said to have problems about stability and performance. On the other hand, ZFS will not be merged into the Linux kernel due to licensing issues.
+Some filesystems have data correction capability (called **scrubbing**) by themselves. On Linux, [btrfs](https://docs.kernel.org/filesystems/btrfs.html) and [OpenZFS](https://github.com/openzfs/zfs) (the Linux port of [ZFS](https://en.wikipedia.org/wiki/ZFS)) are the most famous. They have RAID and snapshot capabilities and are expected to be simpler to configure and faster than a combination of device mappers. However, btrfs has long been said to have problems about stability and performance. On the other hand, ZFS will not be merged into the Linux kernel due to licensing issues.
 
-### Finding the best configuration for long term storage
+### Finding better configuration for long term storage
 
-This study will list several storage configurations that are easy to deploy at home and measure their IO performance (primarily throughput). Because I could not find an detailed performance comparison during normal operation. That's why I started this research. Please refer to other studies for the reliability of each configuration. The following article should be most referenced for reliability.
+The long-term storage we are aiming for has the following characteristics:
+
+- It is the source storage not the backup storage (to not backup corruput data)
+- It reads more frequent than writes
+- Its amount of data increases endlessly
+
+We assume several storage configurations that can be easily deployed at home and measures their performance (especially throughput). Other non-functional requirements are out of scope. Because, what I could not find was the comparison on performance. That is why I started this study.
+
+Of course, each configuration should not be evaluated based solely on throughput. What matters most for long-term storage is reliability and maintainability rather than throughput. For example, the maturity of each component can be estimated from the initial release. The table below shows that ZFS is 18 years old since its first release, while dm-integrity is only 6 years old. It goes without saying which is more "stable".
+
+| Component    | Initial release                                                            |
+| ------------ | -------------------------------------------------------------------------- |
+| LVM2         | 2002 ([merged into Linux 2.5.45](https://kernelnewbies.org/LinuxVersions)) |
+| dm-crypt     | 2004 ([merged into Linux 2.6.4](https://kernelnewbies.org/Linux_2_6_4))    |
+| ZFS          | 2005 ([with OpenSolaris](https://en.wikipedia.org/wiki/ZFS))               |
+| dm-raid      | 2006 ([merged into Linux 2.6.18](https://kernelnewbies.org/Linux_2_6_18))  |
+| ext4         | 2008 ([merged into Linux 2.6.28](https://kernelnewbies.org/Linux_2_6_28))  |
+| btrfs        | 2009 ([merged into Linux 2.6.29](https://kernelnewbies.org/Linux_2_6_29))  |
+| OpenZFS      | 2013 ([first stable on Linux](https://en.wikipedia.org/wiki/OpenZFS))      |
+| dm-integrity | 2017 ([merged into Linux 4.12](https://kernelnewbies.org/Linux_4.12))      |
+
+See other studies for non-functional requirements other than performance. The following articles will be very helpful for reliability.
 
 - [Battle testing ZFS, Btrfs and mdadm+dm-integrity](https://www.unixsheikh.com/articles/battle-testing-zfs-btrfs-and-mdadm-dm.html)
 
@@ -78,6 +99,17 @@ $ sudo hdparm -W0 /dev/{sdb,sdc}
  write-caching =  0 (off)
 ```
 
+Disable write cache for NVMe SSD \#1.
+
+```sh
+$ sudo nvme get-feature /dev/nvme0 -f 6
+get-feature:0x06 (Volatile Write Cache), Current value:0x00000001
+$ sudo nvme set-feature /dev/nvme0 -f 6 -v 0
+set-feature:0x06 (Volatile Write Cache), value:00000000, cdw12:00000000, save:0
+$ sudo nvme get-feature /dev/nvme0 -f 6
+get-feature:0x06 (Volatile Write Cache), Current value:00000000
+```
+
 Change the sector size of the NVMe SSD \#1 to 4096 bytes.
 
 ```sh
@@ -89,11 +121,22 @@ LBA Format  0 : Metadata Size: 0   bytes - Data Size: 512 bytes - Relative Perfo
 LBA Format  1 : Metadata Size: 0   bytes - Data Size: 4096 bytes - Relative Performance: 0x1 Better
 $ sudo nvme format --lbaf=1 /dev/nvme0n1
 ...
+ sudo nvme id-ns -H /dev/nvme0n1 | grep LBA
+  [6:5] : 0	Most significant 2 bits of Current LBA Format Selected
+  [3:0] : 0x1	Least significant 4 bits of Current LBA Format Selected
+  [0:0] : 0	Metadata as Part of Extended Data LBA Not Supported
+LBA Format  0 : Metadata Size: 0   bytes - Data Size: 512 bytes - Relative Performance: 0x2 Good
+LBA Format  1 : Metadata Size: 0   bytes - Data Size: 4096 bytes - Relative Performance: 0x1 Better (in use)
 ```
 
 Set IO scheduler to `none` for SATA HDD \#1~2.
 
 ```sh
+$ cat /sys/block/{sdb,sdc,nvme0n1,ram0}/queue/scheduler
+none [mq-deadline]
+none [mq-deadline]
+[none] mq-deadline
+none
 $ echo none | sudo tee /sys/block/{sdb,sdc}/queue/scheduler
 none
 $ cat /sys/block/{sdb,sdc,nvme0n1,ram0}/queue/scheduler
@@ -144,16 +187,16 @@ Device     Start      End  Sectors Size Type
 /dev/sdc1   2048 16779263 16777216   8G Linux filesystem
 
 
-Disk /dev/nvme0n1: 931.51 GiB, 1000204886016 bytes, 1953525168 sectors
+Disk /dev/nvme0n1: 931.51 GiB, 1000204886016 bytes, 244190646 sectors
 Disk model: WD Red SN700 1000GB
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
+Units: sectors of 1 * 4096 = 4096 bytes
+Sector size (logical/physical): 4096 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
 Disklabel type: gpt
-Disk identifier: 62F63BAD-C4BF-2844-B214-2A8A6EF6C397
+Disk identifier: 66216399-9372-9A4C-B17D-5173CAE18E07
 
-Device         Start      End  Sectors Size Type
-/dev/nvme0n1p1  2048 16779263 16777216   8G Linux filesystem
+Device         Start     End Sectors Size Type
+/dev/nvme0n1p1   256 2097407 2097152   8G Linux filesystem
 
 
 Disk /dev/ram0: 8 GiB, 8589934592 bytes, 16777216 sectors
@@ -173,7 +216,7 @@ The following are candidate configurations suitable for long-term storage combin
 | 3   | ext4 on dm-integrity (no journal)                           | ❌         | ❌         | ❌        | ❌       |
 | 4   | ext4 on dm-integrity (bitmap mode)                          | ❌         | ❌         | ❌        | ❌       |
 | 5   | ext4 on dm-crypt                                            | ✅         | ❌         | ❌        | ❌       |
-| 6   | ext4 on dm-crypt (with `--integrity=hmac-sha256`)           | ✅         | ❌         | ❌        | ❌       |
+| 6   | ext4 on dm-crypt (with dm-integrity, HMAC-SHA256)           | ✅         | ❌         | ❌        | ❌       |
 | 7   | ext4 on dm-crypt on dm-integrity                            | ✅         | ❌         | ❌        | ❌       |
 | 8   | ext4 on dm-raid (RAID 1)                                    | ❌         | ✅         | ⚠️        | ❌       |
 | 9   | ext4 on dm-raid (RAID 1) on dm-integrity                    | ❌         | ✅         | ✅        | ❌       |
@@ -196,17 +239,21 @@ ext4 is the most common filesystem in Linux. In this study, ext4 will be used as
 
 #### \#2~4: ext4 on dm-integrity
 
-dm-integrity has three methods to guarantee write integrity (journal, no journal, and bitmap mode). By default, journal is enabled, which is the most reliable but slower. No-journal is not crash-tolerant, and bitmap mode is less reliable than journal. Since reliability is the primary concern in this study, the journal is used in combination with other device mappers. The default sector size for dm-integrity is 512 bytes. This is too small, so it should be increased to 4,096 bytes.
+dm-integrity has three methods to guarantee write integrity (journal, no journal, and bitmap mode). By default, journal is enabled, which is the most reliable but slower. No-journal is not crash-tolerant, and bitmap mode is less reliable than journal. Since reliability is the primary concern in this study, the journal is used in combination with other device mappers.
+
+The default sector size is 512 bytes, regardless of the drive. Change to 4096 bytes to match the drive.
+
+The default journal commit interval is 10 seconds. Change to 5 seconds to match ext4.
 
 #### \#5~7: ext4 on dm-crypt
 
-dm-crypt performance related parameters are tuned based on [the Cloudflare blog post](https://blog.cloudflare.com/speeding-up-linux-disk-encryption/). The default write interval is 10 seconds. I wanted to set it to 5 seconds to match the ext4 commit interval, but did not know how to change it. This may increase the apparent write performance by using dm-crypt. The default encryption algorithm is `aes-xts-plain64` and hardware acceleration would be available on many CPUs.
+dm-crypt performance related parameters are tuned based on [the Cloudflare blog post](https://blog.cloudflare.com/speeding-up-linux-disk-encryption/). The default encryption algorithm is `aes-xts-plain64` and hardware acceleration would be available on many CPUs.
 
 There is a special combination of dm-crypt and dm-integrity (**\#6**). It is capable of both encryption and tamper detection using HMAC. However, the hash function used in HMAC (usually SHA-256) is not hardware-accelerated and strongly depends on CPU performance. Furthermore, TRIM on SSDs is not available for security reason. This configuration is considered experimental and is only for reference in this study.
 
 #### \#8~9: ext4 on dm-raid
 
-dm-raid can be built on top of dm-integrity as described in the introduction to detect and correct silent data corruption. In this study, the RAID level is RAID 1 because two HDDs are used. Since there is only one SSD and one RAM drive, RAID performance is not measured.
+dm-raid can be built on top of dm-integrity as described in the introduction to detect and correct silent data corruption. In this study, the RAID level is RAID 1 because we have two HDDs. Since there is only one SSD and one RAM drive, RAID performance is not measured.
 
 #### \#10~13: ext4 on LVM
 
@@ -214,7 +261,7 @@ LVM can be combined with dm-raid and dm-integrity to have capabilities similar t
 
 #### \#14~16: btrfs
 
-btrfs commit interval is longer than other filesystems (30 seconds for btrfs, 5 seconds for both ext4 and ZFS). To be fair, set it to 5 seconds.
+The default commit interval is 30 seconds. This is longer than other filesystems (5 seconds for both ext4 and ZFS). To be fair, change to 5 seconds.
 
 #### \#17~19: ZFS
 
@@ -222,14 +269,14 @@ ZFS actively uses RAM as a cache. I measured the throughput beforehand, and it w
 
 ### Data collection
 
-Measure the following throughput performance for each drive and configuration using [fio](https://github.com/axboe/fio). Parameters are based on [CrystalDiskMark](https://crystalmark.info/en/category/crystaldiskmark/)'s "[Peak Performance](https://crystalmark.info/en/software/crystaldiskmark/crystaldiskmark-main-menu/)" profile and [the Nutanix knowledge base](https://portal.nutanix.com/page/documents/kbs/details?targetId=kA07V000000LX7xSAG).
+Measure the following throughput performance for each drive and configuration using [fio](https://github.com/axboe/fio). Parameters are based on [CrystalDiskMark](https://crystalmark.info/en/category/crystaldiskmark/)'s "[Peak Performance](https://crystalmark.info/en/software/crystaldiskmark/crystaldiskmark-main-menu/)" profile.
 
 | Test                   | Read/Write       | Block Size | Queue Size | Threads |
 | ---------------------- | ---------------- | ---------- | ---------- | ------- |
 | `seq-1m-q8-t1-read`    | Sequential Read  | 1 MiB      | 8          | 1       |
 | `seq-1m-q8-t1-write`   | Sequential Write | 1 MiB      | 8          | 1       |
-| `rnd-4k-q32-t16-read`  | Random Read      | 4 kiB      | 32         | 16      |
-| `rnd-4k-q32-t16-write` | Random Write     | 4 kiB      | 32         | 16      |
+| `rnd-4k-q32-t16-read`  | Random Read      | 4 KiB      | 32         | 16      |
+| `rnd-4k-q32-t16-write` | Random Write     | 4 KiB      | 32         | 16      |
 
 See `tools/test.fio` for details.
 
@@ -277,62 +324,75 @@ For details, see `out.sample/` directory.
 
 ![FIO](out.sample/all.hdd.svg)
 
-(TODO)
+HDDs are still the major storage device. Let's take a quick look.
 
-### NVMe SSD #1
+- Combined with dm-integrity, sequential writes are 60% slower. When using no journal or bitmap mode, sequential writes are 10% slower.
+- dm-crypt does not affect performance.
+- Combined with RAID 1, random reads are 100% faster.
+- LVM does not affect performance.
+- btrfs is as good as ext4 (at least on HDDs).
+- ZFS is generally slower. Especially for random access, it is 40~60% slower than ext4.
 
-![FIO](out.sample/all.ssd.svg)
+The slowdown in dm-integrity due to journaling is to be expected.
 
-(TODO)
+Contrary to general reputation, ZFS is slow. One possible reason for this may be that the cache is limited to metadata in this test.
 
-### RAM
+### NVMe SSD #1 and RAM drive
 
-![FIO](out.sample/all.ram.svg)
+![FIO](out.sample/all.ssd+ram.svg)
 
-(TODO)
+Fewer results were obtained because RAID was not tested on the SSD and RAM drives.
 
-### ext4 vs dm-integrity
+In contrast to HDDs, there are large performance differences between configurations. Note some configurations with few differences between SSDs and RAM. Despite the large performance difference between SSD and RAM, the fact that it is not proportional to the bandwidth difference indicates that the bottleneck has shifted from IO to CPU.
 
-![FIO](out.sample/ext4+integrity.svg)
+- dm-integrity has peaked.
+- dm-crypt's performance has also peaked, but it is even slower than dm-integrity.
+- btrfs is slower than ext4.
+- ZFS is even slower than btrfs.
 
-(TODO)
+Fast IO requires fast CPU. Resources at home are very limited, so there will be a strong tradeoff.
 
-### ext4 vs dm-crypt
+### ext4 vs dm-integrirty
 
-![FIO](out.sample/ext4+crypt.svg)
+![FIO](out.sample/ext4+integrity.hdd+ssd.svg)
 
-(TODO)
+Let's compare the differences between the dm-integrity options. For practical comparison, RAM drives are excluded.
 
-### ext4 vs dm-raid
+- The performance difference between the options is seen only in sequential writes.
+- Sequential writes are 100% faster when using no journal or bitmap mode.
 
-![FIO](out.sample/ext4+raid.hdd.svg)
+The performance of dm-integrity is practical enough. Writes are not critical for our long-term storage, as reads are more important. It is not worth sacrificing reliability.
 
-(TODO)
+### ext4 vs dm-integrity vs btrfs vs ZFS
 
-### ext4 vs LVM
+![FIO](out.sample/ext4+integrity-btrfs-zfs.hdd+ssd.svg)
 
-![FIO](out.sample/ext4+lvm.hdd.svg)
+Let's compare filesystems with data correction capabilities. Again, RAM drives are excluded.
 
-(TODO)
+- ext4 on dm-integrity is more than 100% slower than ext4 on sequential writes, but otherwise close.
+- btrfs is about the same as ext4 except for random writes on SSDs.
+- ZFS is slower than all the others. The improvement on SSDs is not worth the IO performance.
 
-### ext4 vs btrfs
+ext4 on dm-integrity and btrfs are good for our long term storage. On HDDs, btrfs is the best. Random writes are slow on SSDs, but could be improved by increasing the commit interval ( we reduced it from the default of 30 seconds to 5 seconds in this test).
 
-![FIO](out.sample/btrfs.hdd.svg)
+ZFS should be used for other workloads with high cache hit ratio.
 
-(TODO)
-
-### ext4 vs ZFS
-
-![FIO](out.sample/zfs.hdd.svg)
-
-(TODO)
-
-### ext4 vs the full-featured configurations
+### ext4 vs the "full-featured"
 
 ![FIO](out.sample/full-featured.hdd.svg)
 
-(TODO)
+We will call a configuration that has all the features (encryption, redundancy, scrubbing, snapshots) required for our long-term storage "full-featured". The following three fall into this.
+
+| #   | Configuration                                               |
+| --- | ----------------------------------------------------------- |
+| 13  | ext4 on LVM on dm-raid (RAID 1) on dm-integrity on dm-crypt |
+| 16  | btrfs (RAID 1) on dm-crypt                                  |
+| 17  | ZFS (RAID1 ) on dm-crypt                                    |
+
+As you can see, btrfs is the best.
 
 ## Conclusion
 
-(TODO)
+In recent years, Internet connection speeds in excess of 1 Gbps have become common. In the near future, cloud storage services that are faster than home storage may appear. But for now, home storage is still faster and cheaper. And it's yours forever.
+
+Performance is only one of the metrics to evaluate, but it is the metric you care about most during normal operations. Hopefully this study will be useful for someone building better long term storage.
