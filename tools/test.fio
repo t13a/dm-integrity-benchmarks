@@ -6,10 +6,10 @@ filename=test.dat
 group_reporting
 ioengine=libaio
 overwrite=1
-ramp_time=5s
-runtime=20s
+ramp_time=60s
+runtime=60s
 size=1G
-startdelay=5s
+startdelay=60s
 stonewall
 time_based
 
